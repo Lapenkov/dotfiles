@@ -1,0 +1,27 @@
+#/* vim: set filetype=zsh : */
+
+# Functions
+function git_main_branch() {
+  echo "features/pilot"
+}
+
+# Git checkout new feautre
+function gcnf() {
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: gcnf [feature_name] - create new feature branch off of the main branch"
+    else
+        gf origin
+        g checkout -t -b "$(whoami)/$1" "origin/$(git_main_branch)"
+    fi
+}
+
+function gcnfrel() {
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: gcnfrel [feature_name] - create new feature branch off of the main branch alongside a rel branch"
+    else
+        gf origin
+        g checkout -t -b "features/${1}_REL" "origin/$(git_main_branch)"
+        ggpush
+        g checkout -t -b "$(whoami)/$1" "origin/$(git_main_branch)"
+    fi
+}

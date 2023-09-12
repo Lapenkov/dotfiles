@@ -1,0 +1,26 @@
+ZSH_THEME="agkozak"
+AGKOZAK_PROMPT_DIRTRIM=4
+AGKOZAK_CMD_EXEC_TIME=3
+
+plugins=(git z)
+
+export ZSH=$HOME/.oh-my-zsh
+source $ZSH/oh-my-zsh.sh
+
+export ZSHCONFIGDIR=$HOME/.config/zsh
+source $ZSHCONFIGDIR/env
+source $ZSHCONFIGDIR/aliases
+source $ZSHCONFIGDIR/bindings
+source $ZSHCONFIGDIR/functions
+
+setopt inc_append_history
+
+# FZF
+[ -f ${HOME}/.fzf.zsh ] && source ~/.fzf.zsh
+
+# ASDF
+[ -f ${HOME}/.asdf/asdf.sh ] && source $HOME/.asdf/asdf.sh
+
+# RVM
+# Must be the last PATH modification
+export PATH="$PATH:$HOME/.rvm/bin"

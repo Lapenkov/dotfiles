@@ -1,0 +1,19 @@
+# Version of zsh prompt
+{{ $agkozakVersion := "3.11.1" -}}
+
+[".oh-my-zsh"]
+    type = "archive"
+    url = "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
+    exact = true
+    stripComponents = 1
+    refreshPeriod = "168h"
+[".oh-my-zsh/custom/themes/agkozak"]
+    type = "archive"
+    url = "https://github.com/agkozak/agkozak-zsh-prompt/archive/refs/tags/v{{ $agkozakVersion }}.tar.gz"
+    exact = true
+    stripComponents = 1
+[".oh-my-zsh/custom/themes/agkozak.zsh-theme"]
+    type = "archive-file"
+    url = "https://github.com/agkozak/agkozak-zsh-prompt/archive/refs/tags/v{{ $agkozakVersion }}.tar.gz"
+    path = "agkozak-zsh-prompt.plugin.zsh"
+    stripComponents = 1

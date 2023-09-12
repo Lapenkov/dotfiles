@@ -1,0 +1,30 @@
+# /* vim: set filetype=zsh : */
+
+export VIMCONFIGDIR="$HOME/.config/nvim"
+
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export SVN_EDITOR=nvim
+export EDITOR=nvim
+export NAME="Alex Lapenkou"
+
+hostname=$(hostname -f)
+export EMAIL="alex.lapenkou@chicagotrading.com"
+
+export FZF_DEFAULT_OPTS="--history=${HOME}/.fzf_history"
+
+# Nebula
+export NEBULA_ROOT="${HOME}/work/nebula"
+export NEBULA_IMAGE_NAME="devopsprodacr.azurecr.io/nebula-base:latest"
+export NEBULA_CONTAINER_NAME="nebula_container_$(whoami)"
+
+# Cargo binaries
+export PATH="${HOME}/.cargo/bin:$PATH"
+# Local binaries
+export PATH="${HOME}/.local/bin:${HOME}/local/bin:$PATH"
+# Pkgsrc we're allowed to use
+export PATH="/ctc/devkit/v1/STABLE/pkgsrc/bin:$PATH"
+# Conda
+export PATH="$HOME/miniconda3/bin:$PATH"
+# Local libraries
+export LD_LIBRARY_PATH="${HOME}/local/lib64:${HOME}/local/lib:$LD_LIBRARY_PATH:${HOME}/miniconda3/lib"
