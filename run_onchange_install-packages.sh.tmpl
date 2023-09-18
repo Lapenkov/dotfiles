@@ -1,0 +1,4 @@
+{{ if eq .chezmoi.osRelease.idLike "debian" -}}
+#!/bin/sh
+sudo apt install nvim fd-find ripgrep
+{{ end }}
