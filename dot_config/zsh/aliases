@@ -3,9 +3,11 @@
 alias ll="ls -lh --group-directories-first"
 
 alias v="nvim"
-alias vv="nvim ."
+alias vv="nvim +LOpenPwd"
 
 alias cz="chezmoi"
+
+alias b="bazelisk"
 
 alias zshconfig="v ${HOME}/.zshrc"
 alias vimconfig="v ${HOME}/.config/nvim/init.lua"
