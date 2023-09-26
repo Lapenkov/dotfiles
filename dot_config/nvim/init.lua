@@ -1,3 +1,18 @@
+function configure_commands()
+    -- Custom commands start with L (short for lapenkoa)
+
+    vim.api.nvim_create_user_command('LOpenPwd',
+        function(opts)
+            vim.cmd.Neotree()
+        end,
+        {})
+end
+
+function configure_nonpkg_mappings()
+    vim.g.mapleader = " "
+    vim.keymap.set("n", "<Leader>n", "<cmd>nohlsearch<cr>")
+end
+
 function configure_indent()
     vim.o.expandtab = true
     vim.o.tabstop = 4
@@ -63,7 +78,36 @@ function configure_pkg()
             branch = "0.1.x",
             dependencies = {
                 "nvim-lua/plenary.nvim",
-            }
+                "nvim-telescope/telescope-live-grep-args.nvim",
+            },
+            config = function()
+                local telescope = require("telescope")
+                local lga_actions = require("telescope-live-grep-args.actions")
+
+                telescope.setup({
+                    pickers = {
+                        find_files = {
+                            hidden = true,
+                        },
+                    },
+                    extensions = {
+                        live_grep_args = {
+                            auto_quoting = true,
+                            mappings = {
+                                i = {
+                                    ["<C-k>"] = lga_actions.quote_prompt(),
+                                    ["<C-p>"] = lga_actions.quote_prompt({ postfix = " --type python " }),
+                                    ["<C-b>"] = lga_actions.quote_prompt({ postfix = " --type bazel " }),
+                                    ["<C-b>"] = lga_actions.quote_prompt({ postfix = " --hidden " }),
+                                    ["<C-t>"] = lga_actions.quote_prompt({ postfix = " --iglob !**/test* " }),
+                                },
+                            },
+                        },
+                    },
+                })
+
+                telescope.load_extension("live_grep_args")
+            end
         },
         {
             "nvim-treesitter/nvim-treesitter",
@@ -78,9 +122,18 @@ function configure_pkg()
             end,
         },
     })
+
+    vim.keymap.set("n", "<Leader>ff", "<cmd>Telescope find_files<cr>")
+    vim.keymap.set("n", "<leader>fg", "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>")
+    vim.keymap.set("n", "<Leader>fp", "<cmd>Telescope live_grep glob_pattern=*.py<cr>")
+    vim.keymap.set("n", "<Leader>tt", "<cmd>Neotree focus<cr>")
+    vim.keymap.set("n", "<Leader>tf", "<cmd>Neotree reveal<cr>")
+    vim.keymap.set("n", "<Leader>tc", "<cmd>Neotree close<cr>")
 end
 
 function configure()
+    configure_commands()
+    configure_nonpkg_mappings()
     configure_indent()
     configure_search()
     configure_clipboard()
