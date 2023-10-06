@@ -96,7 +96,6 @@ function configure_pkg()
                             mappings = {
                                 i = {
                                     ["<C-k>"] = lga_actions.quote_prompt(),
-                                    ["<C-p>"] = lga_actions.quote_prompt({ postfix = " --type python " }),
                                     ["<C-b>"] = lga_actions.quote_prompt({ postfix = " --type bazel " }),
                                     ["<C-b>"] = lga_actions.quote_prompt({ postfix = " --hidden " }),
                                     ["<C-t>"] = lga_actions.quote_prompt({ postfix = " --iglob !**/test* " }),
@@ -121,13 +120,52 @@ function configure_pkg()
                 })
             end,
         },
+        {
+            "NeogitOrg/neogit",
+            dependencies = {
+                "nvim-lua/plenary.nvim",
+                "nvim-telescope/telescope.nvim",
+                "sindrets/diffview.nvim",
+            },
+            config = true,
+        },
+        {
+            "neovim/nvim-lspconfig",
+            config = function()
+                local lspconfig = require("lspconfig")
+                lspconfig.pyright.setup {}
+                lspconfig.clangd.setup({
+                    cmd = {
+                        "clangd",
+                        "--header-insertion=never",
+                        "--background-index",
+                        "--header-insertion-decorators",
+                        "--enable-config",
+                    },
+                })
+
+                vim.api.nvim_create_autocmd("LspAttach", {
+                    group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+                    callback = function(ev)
+                        local opts = { buffer = ev.buf }
+                        vim.keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts)
+                        vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, opts)
+                        vim.keymap.set("n", "<leader>gt", vim.lsp.buf.type_definition, opts)
+                        vim.keymap.set("n", "<leader>cf", vim.lsp.buf.code_action, opts)
+                        vim.keymap.set({ "n", "v" }, "<leader>cc", vim.lsp.buf.format, opts)
+                        vim.keymap.set({ "n", "i" }, "<C-k>", vim.lsp.buf.signature_help, opts)
+                    end
+                })
+            end
+        }
     })
 
     vim.keymap.set("n", "<Leader>ff", "<cmd>Telescope find_files<cr>")
+    vim.keymap.set("n", "<Leader>fb", "<cmd>Telescope buffers<cr>")
     vim.keymap.set("n", "<leader>fg", "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>")
     vim.keymap.set("n", "<Leader>fp", "<cmd>Telescope live_grep glob_pattern=*.py<cr>")
     vim.keymap.set("n", "<Leader>tt", "<cmd>Neotree focus<cr>")
-    vim.keymap.set("n", "<Leader>tf", "<cmd>Neotree reveal<cr>")
+    vim.keymap.set("n", "<Leader>tf", "<cmd>Neotree reveal reveal_force_cwd<cr>")
     vim.keymap.set("n", "<Leader>tc", "<cmd>Neotree close<cr>")
 end
 
