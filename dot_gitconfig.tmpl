@@ -1,0 +1,7 @@
+[user]
+	email = lapenkovalexandr@gmail.com
+	name = Alex Lapenkou
+{{ if eq .chezmoi.osRelease.id "rhel" }}
+[credential "https://gitlab.azure.chicagotrading.com"]
+	helper = !/home/lapenkoa/local/bin/glab auth git-credential
+{{ end }}
