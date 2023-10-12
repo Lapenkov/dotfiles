@@ -152,6 +152,9 @@ function configure_pkg()
             config = true,
         },
         {
+            "FabijanZulj/blame.nvim",
+        },
+        {
             "neovim/nvim-lspconfig",
             config = function()
                 local lspconfig = require("lspconfig")
