@@ -70,8 +70,16 @@ function configure_pkg()
             },
         },
         {
-            -- Theme
-            "nyoom-engineering/oxocarbon.nvim",
+            -- Theme; colorscheme
+            "folke/tokyonight.nvim",
+            lazy = false,
+            config = function()
+                require("tokyonight").setup({
+                    style = "moon",
+                    light_style = "day",
+                    vim.cmd("color tokyonight-storm")
+                })
+            end
         },
         {
             "nvim-telescope/telescope.nvim",
@@ -112,11 +120,25 @@ function configure_pkg()
             "nvim-treesitter/nvim-treesitter",
             config = function()
                 require("nvim-treesitter.configs").setup({
-                    enable = true,
                     ensure_installed = { "c", "cpp", "python", "yaml", "lua", "vim", "vimdoc", "query", "json" },
                     sync_install = true,
                     auto_install = true,
-                    additional_vim_regex_highlighting = false,
+                    highlight = {
+                        enable = true,
+                        additional_vim_regex_highlighting = false,
+                    },
+                    indent = {
+                        enable = true,
+                    },
+                    incremental_selection = {
+                        enable = true,
+                        keymaps = {
+                            init_selection = '<CR>',
+                            scope_incremental = '<CR>',
+                            node_incremental = '<TAB>',
+                            node_decremental = '<S-TAB>',
+                        },
+                    },
                 })
             end,
         },
@@ -171,6 +193,11 @@ function configure_pkg()
 end
 
 function configure()
+    vim.o.number = true
+    vim.o.wildoptions = "fuzzy,pum,tagfile"
+    vim.o.wildmode = "full"
+    vim.o.matchpairs =  vim.o.matchpairs .. ",<:>"
+
     configure_commands()
     configure_nonpkg_mappings()
     configure_indent()
@@ -178,10 +205,6 @@ function configure()
     configure_clipboard()
     configure_mouse()
     configure_pkg()
-
-    vim.o.number = true
-    vim.o.wildoptions = "fuzzy,pum,tagfile"
-    vim.o.wildmode = "full"
 end
 
 configure()
