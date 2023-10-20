@@ -2,8 +2,8 @@
 {{ $agkozakVersion := "3.11.1" -}}
 
 [".oh-my-zsh"]
-    type = "archive"
-    url = "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
+    type = "git-repo"
+    url = "git@github.com:ohmyzsh/ohmyzsh.git"
     exact = true
     stripComponents = 1
     refreshPeriod = "168h"
