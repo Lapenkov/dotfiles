@@ -2,7 +2,11 @@
 
 # Functions
 function git_main_branch() {
-  echo "features/pilot"
+    if [[ "$(pwd)" =~ ".*nebula.*" ]]; then
+        echo "features/pilot"
+    else
+        echo "master"
+    fi
 }
 
 # Git checkout new feautre
@@ -22,6 +26,7 @@ function gcnfrel() {
         gf origin
         g checkout -t -b "features/${1}_REL" "origin/$(git_main_branch)"
         ggpush
-        g checkout -t -b "$(whoami)/$1" "origin/$(git_main_branch)"
+        g checkout -b "$(whoami)/$1" "origin/$(git_main_branch)"
+        g branch --set-upstream-to "features/${1}_REL"
     fi
 }

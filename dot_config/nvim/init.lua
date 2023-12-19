@@ -1,16 +1,18 @@
 function configure_commands()
     -- Custom commands start with L (short for lapenkoa)
 
-    vim.api.nvim_create_user_command('LOpenPwd',
+    vim.api.nvim_create_user_command("LOpenPwd",
         function(opts)
             vim.cmd.Neotree()
+            vim.cmd.wincmd("l")
+            require("telescope.builtin").find_files()
         end,
         {})
 end
 
 function configure_nonpkg_mappings()
     vim.g.mapleader = " "
-    vim.keymap.set("n", "<Leader>n", "<cmd>nohlsearch<cr>")
+    vim.keymap.set("n", "<leader>n", "<cmd>nohlsearch<cr>")
 end
 
 function configure_indent()
@@ -62,12 +64,29 @@ function configure_pkg()
     require("lazy").setup({
         {
             "nvim-neo-tree/neo-tree.nvim",
+            lazy = false,
             branch = "v3.x",
             dependencies = {
                 "nvim-lua/plenary.nvim",
                 "nvim-tree/nvim-web-devicons",
                 "MunifTanjim/nui.nvim",
             },
+            keys = {
+                { "<leader>tt", "<cmd>Neotree focus<cr>" },
+                { "<leader>tf", "<cmd>Neotree reveal reveal_force_cwd<cr>" },
+                { "<leader>tc", "<cmd>Neotree close<cr>" },
+            },
+            config = function()
+                require("neo-tree").setup({
+                    filesystem = {
+                        window = {
+                            mappings = {
+                                ["u"] = "navigate_up",
+                            },
+                        },
+                    },
+                })
+            end
         },
         {
             -- Theme; colorscheme
@@ -86,41 +105,52 @@ function configure_pkg()
             branch = "0.1.x",
             dependencies = {
                 "nvim-lua/plenary.nvim",
-                "nvim-telescope/telescope-live-grep-args.nvim",
+                { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+            },
+            keys = {
+                { "<leader>ff", "<cmd>Telescope find_files --hidden=true<cr>" },
+                { "<leader>fc", "<cmd>Telescope find_files --hidden=false<cr>" },
+                { "<leader>fb", "<cmd>Telescope buffers<cr>" },
+                { "<leader>fG", "<cmd>Telescope live_grep<cr>" },
+                { "<leader>fg", "<cmd>Telescope live_grep --type=cpp<cr>" },
+                { "<leader>fp", "<cmd>Telescope live_grep --type=py<cr>" },
             },
             config = function()
                 local telescope = require("telescope")
-                local lga_actions = require("telescope-live-grep-args.actions")
+                local actions = require("telescope.actions")
 
                 telescope.setup({
-                    pickers = {
-                        find_files = {
-                            hidden = true,
-                        },
-                    },
-                    extensions = {
-                        live_grep_args = {
-                            auto_quoting = true,
-                            mappings = {
-                                i = {
-                                    ["<C-k>"] = lga_actions.quote_prompt(),
-                                    ["<C-b>"] = lga_actions.quote_prompt({ postfix = " --type bazel " }),
-                                    ["<C-b>"] = lga_actions.quote_prompt({ postfix = " --hidden " }),
-                                    ["<C-t>"] = lga_actions.quote_prompt({ postfix = " --iglob !**/test* " }),
-                                },
+                    defaults = {
+                        mappings = {
+                            i = {
+                                ["<C-j>"] = actions.move_selection_next,
+                                ["<C-k>"] = actions.move_selection_previous,
+                                ["<C-n>"] = actions.cycle_history_next,
+                                ["<C-p>"] = actions.cycle_history_prev,
+                                ["<C-d>"] = actions.delete_buffer + actions.move_to_top,
                             },
                         },
                     },
+                    extensions = {
+                        fzf = {
+                            fuzzy = true,
+                            override_generic_sorter = true,
+                            override_file_sorter = true,
+                            case_mode = "smart_case",
+                        }
+                    },
                 })
-
-                telescope.load_extension("live_grep_args")
             end
         },
         {
             "nvim-treesitter/nvim-treesitter",
             config = function()
                 require("nvim-treesitter.configs").setup({
-                    ensure_installed = { "c", "cpp", "python", "yaml", "lua", "vim", "vimdoc", "query", "json" },
+                    ensure_installed = {
+                        "c", "cpp", "python", "lua",
+                        "vim", "vimdoc", "query",
+                        "json", "xml", "toml", "yaml",
+                    },
                     sync_install = true,
                     auto_install = true,
                     highlight = {
@@ -130,8 +160,8 @@ function configure_pkg()
                     incremental_selection = {
                         enable = true,
                         keymaps = {
-                            init_selection = '<CR>',
-                            scope_incremental = '<CR>',
+                            init_selection = '<cr>',
+                            scope_incremental = '<cr>',
                             node_incremental = '<TAB>',
                             node_decremental = '<S-TAB>',
                         },
@@ -150,12 +180,24 @@ function configure_pkg()
         },
         {
             "FabijanZulj/blame.nvim",
+            keys = {
+                { "<leader>tb", "<cmd>ToggleBlame<cr>" },
+            },
         },
         {
             "neovim/nvim-lspconfig",
             config = function()
                 local lspconfig = require("lspconfig")
-                lspconfig.pylsp.setup {}
+                lspconfig.pylsp.setup {
+                    settings = {
+                        pylsp = {
+                            plugins = {
+                                black = { enabled = true },
+                                yapf = { enabled = false },
+                            },
+                        },
+                    },
+                }
                 lspconfig.clangd.setup({
                     cmd = {
                         "clangd",
@@ -175,25 +217,20 @@ function configure_pkg()
                         vim.keymap.set("n", "<leader>gt", vim.lsp.buf.type_definition, opts)
                         vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, opts)
                         vim.keymap.set("n", "<leader>cf", vim.lsp.buf.code_action, opts)
+                        vim.keymap.set("n", "<leader>ee", vim.diagnostic.open_float, opts)
                         vim.keymap.set({ "n", "v" }, "<leader>cc", vim.lsp.buf.format, opts)
                         vim.keymap.set({ "n", "i" }, "<C-k>", vim.lsp.buf.signature_help, opts)
+                        vim.keymap.set("n", "<leader>gh", "<cmd>ClangdSwitchSourceHeader<cr>")
                     end
                 })
             end
         }
     })
-
-    vim.keymap.set("n", "<Leader>ff", "<cmd>Telescope find_files<cr>")
-    vim.keymap.set("n", "<Leader>fb", "<cmd>Telescope buffers<cr>")
-    vim.keymap.set("n", "<leader>fg", "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>")
-    vim.keymap.set("n", "<Leader>fp", "<cmd>Telescope live_grep glob_pattern=*.py<cr>")
-    vim.keymap.set("n", "<Leader>tt", "<cmd>Neotree focus<cr>")
-    vim.keymap.set("n", "<Leader>tf", "<cmd>Neotree reveal reveal_force_cwd<cr>")
-    vim.keymap.set("n", "<Leader>tc", "<cmd>Neotree close<cr>")
 end
 
 function configure()
     vim.o.number = true
+    vim.o.wrap = true
     vim.o.wildoptions = "fuzzy,pum,tagfile"
     vim.o.wildmode = "full"
     vim.o.matchpairs =  vim.o.matchpairs .. ",<:>"
