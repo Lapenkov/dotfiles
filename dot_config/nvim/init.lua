@@ -110,10 +110,15 @@ function configure_pkg()
             keys = {
                 { "<leader>ff", "<cmd>Telescope find_files --hidden=true<cr>" },
                 { "<leader>fc", "<cmd>Telescope find_files --hidden=false<cr>" },
-                { "<leader>fb", "<cmd>Telescope buffers<cr>" },
+                { "<leader>fb",
+                    function(plugin)
+                        require('telescope.builtin').buffers({ sort_lastused = true, ignore_current_buffer = true })
+                    end,
+                },
                 { "<leader>fG", "<cmd>Telescope live_grep<cr>" },
                 { "<leader>fg", "<cmd>Telescope live_grep --type=cpp<cr>" },
                 { "<leader>fp", "<cmd>Telescope live_grep --type=py<cr>" },
+                { "<leader>fs", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>" },
             },
             config = function()
                 local telescope = require("telescope")
@@ -127,7 +132,7 @@ function configure_pkg()
                                 ["<C-k>"] = actions.move_selection_previous,
                                 ["<C-n>"] = actions.cycle_history_next,
                                 ["<C-p>"] = actions.cycle_history_prev,
-                                ["<C-d>"] = actions.delete_buffer + actions.move_to_top,
+                                ["<C-d>"] = actions.delete_buffer,
                             },
                         },
                     },
@@ -179,9 +184,10 @@ function configure_pkg()
             config = true,
         },
         {
-            "FabijanZulj/blame.nvim",
+            "tpope/vim-fugitive",
+            lazy = false,
             keys = {
-                { "<leader>tb", "<cmd>ToggleBlame<cr>" },
+                { "<leader>tb", "<cmd>Git blame<cr>" },
             },
         },
         {
@@ -202,9 +208,12 @@ function configure_pkg()
                     cmd = {
                         "clangd",
                         "--header-insertion=never",
-                        "--background-index",
+                        "--background-index=false",
                         "--header-insertion-decorators",
                         "--enable-config",
+                        "--offset-encoding=utf-16",
+                        "--malloc-trim",
+                        "--pch-storage=disk"
                     },
                 })
 
@@ -219,12 +228,16 @@ function configure_pkg()
                         vim.keymap.set("n", "<leader>cf", vim.lsp.buf.code_action, opts)
                         vim.keymap.set("n", "<leader>ee", vim.diagnostic.open_float, opts)
                         vim.keymap.set({ "n", "v" }, "<leader>cc", vim.lsp.buf.format, opts)
-                        vim.keymap.set({ "n", "i" }, "<C-k>", vim.lsp.buf.signature_help, opts)
                         vim.keymap.set("n", "<leader>gh", "<cmd>ClangdSwitchSourceHeader<cr>")
+                        vim.keymap.set("n", "]e", vim.diagnostic.goto_next, opts)
+                        vim.keymap.set("n", "]E", vim.diagnostic.goto_prev, opts)
                     end
                 })
             end
-        }
+        },
+        {
+            "github/copilot.vim"
+        },
     })
 end
 

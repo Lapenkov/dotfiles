@@ -20,4 +20,5 @@ alias gpra='git pull --rebase origin "$(git_current_branch)"'
 alias glg="git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 alias glg2="log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
 
-alias conda="${HOME}/miniconda3/bin/conda"
+# Copilot aliases
+eval "$(github-copilot-cli alias -- "$0")"
