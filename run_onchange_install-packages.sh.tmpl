@@ -1,4 +1,5 @@
 {{ if eq .chezmoi.osRelease.id "ubuntu" -}}
 #!/bin/sh
-sudo apt install nvim fd-find ripgrep
+sudo apt update
+sudo apt install zsh neovim fd-find ripgrep
 {{ end }}
