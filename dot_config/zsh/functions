@@ -54,6 +54,14 @@ function gcg() {
     fi
 }
 
+function gcof() {
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: gcof [feature_name] - checkout feature branch"
+    else
+        g checkout "$(whoami)/$1"
+    fi
+}
+
 function __find_conanfile_dir() {
     folder=$(pwd)
     found=false

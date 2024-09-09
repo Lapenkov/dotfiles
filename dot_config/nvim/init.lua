@@ -13,6 +13,8 @@ end
 function configure_nonpkg_mappings()
     vim.g.mapleader = " "
     vim.keymap.set("n", "<leader>n", "<cmd>nohlsearch<cr>")
+    vim.keymap.set("n", "]c", "<cmd>cnext<cr>")
+    vim.keymap.set("n", "]C", "<cmd>cprev<cr>")
 end
 
 function configure_indent()
@@ -24,23 +26,6 @@ end
 function configure_search()
     vim.o.ignorecase = true
     vim.o.smartcase = true
-end
-
-function configure_clipboard()
-    local powershell_path = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
-    local clip_path = "/mnt/c/Windows/System32/clip.exe"
-    vim.g.clipboard = {
-        name = "WSL",
-        copy = {
-            ["+"] = clip_path,
-            ["*"] = clip_path,
-        },
-        paste = {
-            ["+"] = powershell_path .. ' -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-            ["*"] = powershell_path .. ' -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-        },
-        cache_enabled = true
-    }
 end
 
 function configure_mouse()
@@ -206,7 +191,7 @@ function configure_pkg()
                 }
                 lspconfig.clangd.setup({
                     cmd = {
-                        "clangd",
+                        "/ctc/users/lapenkoa/conan_data/llvm-project/18.1.1/tools/opt/package/951857a798b4abc157d26eafae83b3d683f8ede1/bin/clangd",
                         "--header-insertion=never",
                         "--background-index=false",
                         "--header-insertion-decorators",
@@ -224,11 +209,14 @@ function configure_pkg()
                         vim.keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts)
                         vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, opts)
                         vim.keymap.set("n", "<leader>gt", vim.lsp.buf.type_definition, opts)
-                        vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, opts)
-                        vim.keymap.set("n", "<leader>cf", vim.lsp.buf.code_action, opts)
+                        vim.keymap.set("n", "<leader>gr", require('telescope.builtin').lsp_references, opts)
+                        vim.keymap.set("n", "<leader>gc", require('telescope.builtin').lsp_incoming_calls, opts)
+                        vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, opts)
+                        vim.keymap.set("n", "<leader>cf", function() vim.lsp.buf.code_action { apply = true } end, opts)
                         vim.keymap.set("n", "<leader>ee", vim.diagnostic.open_float, opts)
                         vim.keymap.set({ "n", "v" }, "<leader>cc", vim.lsp.buf.format, opts)
                         vim.keymap.set("n", "<leader>gh", "<cmd>ClangdSwitchSourceHeader<cr>")
+                        vim.keymap.set("n", "<leader>ci", vim.lsp.buf.hover, opts)
                         vim.keymap.set("n", "]e", vim.diagnostic.goto_next, opts)
                         vim.keymap.set("n", "]E", vim.diagnostic.goto_prev, opts)
                     end
@@ -252,7 +240,6 @@ function configure()
     configure_nonpkg_mappings()
     configure_indent()
     configure_search()
-    configure_clipboard()
     configure_mouse()
     configure_pkg()
 end
