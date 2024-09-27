@@ -13,6 +13,12 @@ source $ZSHCONFIGDIR/env
 source $ZSHCONFIGDIR/aliases
 source $ZSHCONFIGDIR/bindings
 source $ZSHCONFIGDIR/functions
+{{- if eq .chezmoi.osRelease.id "rhel" }}
+source $ZSHCONFIGDIR/work_ext/env
+source $ZSHCONFIGDIR/work_ext/aliases
+source $ZSHCONFIGDIR/work_ext/bindings
+source $ZSHCONFIGDIR/work_ext/functions
+{{- end }}
 
 setopt inc_append_history
 

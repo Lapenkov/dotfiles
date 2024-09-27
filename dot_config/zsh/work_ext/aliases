@@ -1,0 +1,4 @@
+#/* vim: set filetype=zsh : */
+
+# Copilot alias
+eval "$(github-copilot-cli alias -- "$0")"

@@ -1,0 +1,19 @@
+#/* vim: set filetype=zsh : */
+
+# Tools env
+export MAMBA_TOOLS_ENV="${HOME}/micromamba/envs/tools"
+# Local libraries
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${MAMBA_TOOLS_ENV}/lib"
+# Conda
+export PATH="${MAMBA_TOOLS_ENV}/bin:${PATH}"
+
+# Node
+export PATH="${HOME}/local/node-v20.11.0-linux-x64/bin:${PATH}"
+# Nebula
+export NVME_HOME="/ctc/users/lapenkoa"
+export TMPDIR="${NVME_HOME}/tmp"
+
+export NEBULA_ROOT="${HOME}/work/nebula"
+export NEBULA_IMAGE_NAME="devopsprodacr.azurecr.io/nebula-base:latest"
+export NEBULA_CONTAINER_NAME="nebula_container_$(whoami)"
+export EMAIL="alex.lapenkou@chicagotrading.com"

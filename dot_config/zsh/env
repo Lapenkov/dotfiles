@@ -1,0 +1,17 @@
+# /* vim: set filetype=zsh : */
+
+export VIMCONFIGDIR="${HOME}/.config/nvim"
+
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export EDITOR=nvim
+export NAME="Alex Lapenkou"
+export EMAIL="lapenkovalexandr@gmail.com"
+export FZF_DEFAULT_OPTS="--history=${HOME}/.fzf_history"
+
+# Cargo binaries
+export PATH="${HOME}/.cargo/bin:${PATH}"
+# Local binaries
+export PATH="${HOME}/.local/bin:${HOME}/local/bin:${PATH}"
+# Local libraries
+export LD_LIBRARY_PATH="${HOME}/local/lib64:${HOME}/local/lib:${LD_LIBRARY_PATH}"

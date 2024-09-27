@@ -2,3 +2,7 @@
 
 bindkey "^[[1;3C" forward-word
 bindkey "^[[1;3D" backward-word
+
+# Bind this function to a key, e.g., Alt-w
+zle -N wrap_last_word_with_which
+bindkey '^[e' wrap_last_word_with_which

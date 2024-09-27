@@ -191,8 +191,7 @@ function configure_pkg()
                 }
                 lspconfig.clangd.setup({
                     cmd = {
-                        "/ctc/users/lapenkoa/conan_data/llvm-project/18.1.1/tools/opt/package/951857a798b4abc157d26eafae83b3d683f8ede1/bin/clangd",
-                        "--header-insertion=never",
+                        "/home/lapenkoa/work/mdflow_core/external/llvm/bin/clangd",
                         "--background-index=false",
                         "--header-insertion-decorators",
                         "--enable-config",

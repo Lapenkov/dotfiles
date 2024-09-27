@@ -1,0 +1,194 @@
+#/* vim: set filetype=zsh : */
+
+function git_main_branch() {
+    if [[ "$(pwd)" =~ ".*nebula.*" ]]; then
+        echo "features/pilot"
+    elif [[ "$(pwd)" =~ ".*ctc-bazel-tools.*" ]]; then
+        echo "main"
+    else
+        echo "master"
+    fi
+}
+
+# Git checkout new feautre
+function gcnf() {
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: gcnf [feature_name] - create new feature branch off of the main branch"
+    else
+        gf origin
+        g checkout -t -b "$(whoami)/$1" "origin/$(git_main_branch)"
+    fi
+}
+
+# Git checkout new feature and rel branch.
+# Creates a new feature branch off of the main branch and a rel branch off of the main branch.
+function gcnfrel() {
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: gcnfrel [feature_name] - create new feature branch off of the main branch alongside a rel branch"
+    else
+        gf origin
+        g checkout -t -b "features/${1}_REL" "origin/$(git_main_branch)"
+        ggpush
+        g checkout -b "$(whoami)/$1" "origin/$(git_main_branch)"
+        g branch --set-upstream-to "features/${1}_REL"
+    fi
+}
+
+# Git checkout switch between rel and feature branch. Must be currently on a feature or rel branch.
+function gcg() {
+    if [[ $# -ne 0 ]]; then
+        echo "Usage: gswitch - switch between feature and rel branches"
+    else
+        branch=$(git rev-parse --abbrev-ref HEAD)
+        # Errors if current branch is not a feature or rel branch
+        if [[ ! "${branch}" =~ "features/.*_REL" ]] && [[ ! "${branch}" =~ "$(whoami)/.*" ]]; then
+            echo "Error: Not on a feature or REL branch"
+            return
+        fi
+        # Removes part before the first / and _REL
+        normalized_branch=$(echo ${branch} | sed -e 's/^.*\///' -e 's/_REL//')
+        if [[ "${branch}" =~ ".*_REL" ]]; then
+            g checkout "$(whoami)/${normalized_branch}"
+        else
+            g checkout "features/${normalized_branch}_REL"
+        fi
+    fi
+}
+
+function gcof() {
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: gcof [feature_name] - checkout feature branch"
+    else
+        g checkout "$(whoami)/$1"
+    fi
+}
+
+function __find_conanfile_dir() {
+    folder=$(pwd)
+    found=false
+    while [[ "${folder}" != "/" ]]; do
+        if [[ -f "${folder}/conanfile.py" ]]; then
+            found=true
+            break
+        fi
+        folder=$(dirname "${folder}")
+    done
+    if [[ "${found}" == "true" ]]; then
+        echo "${folder}"
+    else
+        echo "Error: No conanfile.py found"
+        return 1
+    fi
+}
+
+function c2install() {
+    if [[ $# -lt 1 ]]; then
+        echo "Usage: c2install <profile_name> - call conan2 install with the specified profile"
+    else
+        version=$(conan --version)
+        if [[ ${version} =~ "1.*" ]]; then
+            echo "Error: Conan 1.x detected. Please use conan 2 instead"
+            return
+        fi
+        folder=$(__find_conanfile_dir)
+        if [[ $? -ne 0 ]]; then
+            echo "Error: No conanfile.py found"
+        else 
+            conan install ${folder} --profile:host ${folder}/profiles/${1} --profile:build ${folder}/profiles/${1} --output-folder ${folder}/build_v2 ${@:2}
+        fi
+    fi
+}
+
+function c2build() {
+    if [[ $# -lt 1 ]]; then
+        echo "Usage: c2build <profile_name> - call conan2 build with the specified profile"
+    else
+        version=$(conan --version)
+        if [[ ${version} =~ "1.*" ]]; then
+            echo "Error: Conan 1.x detected. Please use conan 2 instead"
+            return
+        fi
+        folder=$(__find_conanfile_dir)
+        if [[ $? -ne 0 ]]; then
+            echo "Error: No conanfile.py found"
+        else 
+            conan build ${folder} --profile:host ${folder}/profiles/${1} --profile:build ${folder}/profiles/${1} --output-folder ${folder}/build_v2 ${@:2}
+        fi
+    fi
+}
+
+function c2export() {
+    if [[ $# -lt 3 ]]; then
+        echo "Usage: c2export <profile_name> <package_name> <version> - call conan2 export with the specified profile, name and version"
+    else
+        version=$(conan --version)
+        if [[ ${version} =~ "1.*" ]]; then
+            echo "Error: Conan 1.x detected. Please use conan 2 instead"
+            return
+        fi
+        folder=$(__find_conanfile_dir)
+        if [[ $? -ne 0 ]]; then
+            echo "Error: No conanfile.py found"
+        else 
+            conan export-pkg ${folder} --name $2 --version $3 --user "$(whoami)" --channel snapshot --profile:host ${folder}/profiles/${1} --profile:build ${folder}/profiles/${1} --output-folder ${folder}/build_v2 ${@:4}
+        fi
+    fi
+}
+
+function cinstall() {
+    if [[ $# -lt 1 ]]; then
+        echo "Usage: cinstall <profile_name> - call conan install with the specified profile"
+    else
+        version=$(conan --version)
+        if [[ ${version} =~ "2.*" ]]; then
+            echo "Error: Conan 2.x detected. Please use conan 1 instead"
+            return
+        fi
+        folder=$(__find_conanfile_dir)
+        if [[ $? -ne 0 ]]; then
+            echo "Error: No conanfile.py found"
+        else 
+            conan install ${folder} --profile:host ${folder}/profiles/${1} --profile:build ${folder}/profiles/${1} --install-folder ${folder}/build ${@:2}
+        fi
+    fi
+}
+
+function cbuild() {
+    if [[ $# -lt 1 ]]; then
+        echo "Usage: cbuild - call conan build"
+    else
+        version=$(conan --version)
+        if [[ ${version} =~ "2.*" ]]; then
+            echo "Error: Conan 2.x detected. Please use conan 1 instead"
+            return
+        fi
+        folder=$(__find_conanfile_dir)
+        if [[ $? -ne 0 ]]; then
+            echo "Error: No conanfile.py found"
+        else 
+            conan build ${folder} --install-folder ${folder}/build ${@:2}
+        fi
+    fi
+}
+
+function cexport() {
+    if [[ $# -lt 2 ]]; then
+        echo "Usage: cexport <package_name> [<version>] - call conan export with the specified profile, name and version"
+    else
+        pkg_version="99.99.99"
+        if [[ $# -eq 3 ]]; then
+            pkg_version=$2
+        fi
+        version=$(conan --version)
+        if [[ ${version} =~ "2.*" ]]; then
+            echo "Error: Conan 2.x detected. Please use conan 1 instead"
+            return
+        fi
+        folder=$(__find_conanfile_dir)
+        if [[ $? -ne 0 ]]; then
+            echo "Error: No conanfile.py found"
+        else 
+            conan export-pkg ${folder} ${1}/${pkg_version}@$(whoami)/snapshot --install-folder ${folder}/build --build-folder ${folder}/build --force
+        fi
+    fi
+}
