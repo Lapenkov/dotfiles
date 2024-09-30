@@ -28,8 +28,10 @@ setopt inc_append_history
 # ASDF
 [ -f ${HOME}/.asdf/asdf.sh ] && source $HOME/.asdf/asdf.sh
 
+{{- if eq .chezmoi.osRelease.id "rhel" }}
 # Allows to activate mamba environments
 eval "$(micromamba shell hook --shell zsh)"
+{{- end }}
 
 # RVM
 # Must be the last PATH modification

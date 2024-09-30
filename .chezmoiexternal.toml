@@ -1,5 +1,5 @@
 # Version of zsh prompt
-{{ $agkozakVersion := "3.11.1" -}}
+{{ $agkozakVersion := "3.11.3" -}}
 
 [".oh-my-zsh"]
     type = "archive"
