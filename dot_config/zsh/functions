@@ -15,3 +15,17 @@ function wrap_last_word_with_which() {
   # Return the cursor to where it was
   zle end-of-line
 }
+
+function fzf_bazel_target_completion() {
+  local targets
+  targets=$(bazelisk query //... --output=label 2>/dev/null)
+  if [ -n "$targets" ]; then
+    local selected_target
+    selected_target=$(echo "$targets" | fzf --height 40% --reverse --prompt="Bazel target > ")
+    if [ -n "$selected_target" ]; then
+        BUFFER="${BUFFER}${selected_target}"
+        CURSOR=${#BUFFER}
+        zle redisplay
+    fi
+  fi
+}

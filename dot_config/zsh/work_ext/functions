@@ -5,6 +5,8 @@ function git_main_branch() {
         echo "features/pilot"
     elif [[ "$(pwd)" =~ ".*ctc-bazel-tools.*" ]]; then
         echo "main"
+    elif [[ "$(pwd)" =~ ".*legato.*" ]]; then
+        echo "main"
     else
         echo "master"
     fi
@@ -86,7 +88,7 @@ function c2install() {
         echo "Usage: c2install <profile_name> - call conan2 install with the specified profile"
     else
         version=$(conan --version)
-        if [[ ${version} =~ "1.*" ]]; then
+        if [[ ${version} =~ "1\.[0-9]\.[0-9]" ]]; then
             echo "Error: Conan 1.x detected. Please use conan 2 instead"
             return
         fi
@@ -94,26 +96,22 @@ function c2install() {
         if [[ $? -ne 0 ]]; then
             echo "Error: No conanfile.py found"
         else 
-            conan install ${folder} --profile:host ${folder}/profiles/${1} --profile:build ${folder}/profiles/${1} --output-folder ${folder}/build_v2 ${@:2}
+            conan install ${folder} --profile:host ${folder}/profiles/${1} --profile:build ${folder}/profiles/${1} ${@:2}
         fi
     fi
 }
 
 function c2build() {
-    if [[ $# -lt 1 ]]; then
-        echo "Usage: c2build <profile_name> - call conan2 build with the specified profile"
-    else
-        version=$(conan --version)
-        if [[ ${version} =~ "1.*" ]]; then
-            echo "Error: Conan 1.x detected. Please use conan 2 instead"
-            return
-        fi
-        folder=$(__find_conanfile_dir)
-        if [[ $? -ne 0 ]]; then
-            echo "Error: No conanfile.py found"
-        else 
-            conan build ${folder} --profile:host ${folder}/profiles/${1} --profile:build ${folder}/profiles/${1} --output-folder ${folder}/build_v2 ${@:2}
-        fi
+    version=$(conan --version)
+    if [[ ${version} = "1\.[0-9]\.[0-9]" ]]; then
+        echo "Error: Conan 1.x detected. Please use conan 2 instead"
+        return
+    fi
+    folder=$(__find_conanfile_dir)
+    if [[ $? -ne 0 ]]; then
+        echo "Error: No conanfile.py found"
+    else 
+        conan build ${folder} --profile:host ${folder}/profiles/${1} --profile:build ${folder}/profiles/${1} ${@:2}
     fi
 }
 
@@ -122,7 +120,7 @@ function c2export() {
         echo "Usage: c2export <profile_name> <package_name> <version> - call conan2 export with the specified profile, name and version"
     else
         version=$(conan --version)
-        if [[ ${version} =~ "1.*" ]]; then
+        if [[ ${version} =~ "1\.[0-9]\.[0-9]" ]]; then
             echo "Error: Conan 1.x detected. Please use conan 2 instead"
             return
         fi
@@ -140,7 +138,7 @@ function cinstall() {
         echo "Usage: cinstall <profile_name> - call conan install with the specified profile"
     else
         version=$(conan --version)
-        if [[ ${version} =~ "2.*" ]]; then
+        if [[ ${version} =~ "2\.[0-9]\.[0-9]" ]]; then
             echo "Error: Conan 2.x detected. Please use conan 1 instead"
             return
         fi
@@ -158,7 +156,7 @@ function cbuild() {
         echo "Usage: cbuild - call conan build"
     else
         version=$(conan --version)
-        if [[ ${version} =~ "2.*" ]]; then
+        if [[ ${version} =~ "2\.[0-9]\.[0-9]" ]]; then
             echo "Error: Conan 2.x detected. Please use conan 1 instead"
             return
         fi
@@ -180,7 +178,7 @@ function cexport() {
             pkg_version=$2
         fi
         version=$(conan --version)
-        if [[ ${version} =~ "2.*" ]]; then
+        if [[ ${version} =~ "2\.[0-9]\.[0-9]" ]]; then
             echo "Error: Conan 2.x detected. Please use conan 1 instead"
             return
         fi

@@ -11,13 +11,13 @@ source $ZSH/oh-my-zsh.sh
 export ZSHCONFIGDIR=$HOME/.config/zsh
 source $ZSHCONFIGDIR/env
 source $ZSHCONFIGDIR/aliases
-source $ZSHCONFIGDIR/bindings
 source $ZSHCONFIGDIR/functions
+source $ZSHCONFIGDIR/bindings
 {{- if eq .chezmoi.osRelease.id "rhel" }}
 source $ZSHCONFIGDIR/work_ext/env
 source $ZSHCONFIGDIR/work_ext/aliases
-source $ZSHCONFIGDIR/work_ext/bindings
 source $ZSHCONFIGDIR/work_ext/functions
+source $ZSHCONFIGDIR/work_ext/bindings
 {{- end }}
 
 setopt inc_append_history
@@ -25,10 +25,10 @@ setopt inc_append_history
 # FZF
 [ -f ${HOME}/.fzf.zsh ] && source ~/.fzf.zsh
 
+{{- if eq .chezmoi.osRelease.id "rhel" }}
 # ASDF
 [ -f ${HOME}/.asdf/asdf.sh ] && source $HOME/.asdf/asdf.sh
 
-{{- if eq .chezmoi.osRelease.id "rhel" }}
 # Allows to activate mamba environments
 eval "$(micromamba shell hook --shell zsh)"
 {{- end }}

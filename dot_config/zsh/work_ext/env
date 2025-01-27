@@ -17,3 +17,12 @@ export NEBULA_ROOT="${HOME}/work/nebula"
 export NEBULA_IMAGE_NAME="devopsprodacr.azurecr.io/nebula-base:latest"
 export NEBULA_CONTAINER_NAME="nebula_container_$(whoami)"
 export EMAIL="alex.lapenkou@chicagotrading.com"
+
+# FPGA card
+export FPGA_NAME=fpga1
+
+# Conan
+export CONAN_HOME=${NVME_HOME}/conan2
+export CONAN_USER_HOME=${NVME_HOME}/conan
+
+export REQUESTS_CA_BUNDLE=/etc/pki/tls/cert.pem

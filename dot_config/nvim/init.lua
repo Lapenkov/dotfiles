@@ -93,18 +93,49 @@ function configure_pkg()
                 { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
             },
             keys = {
-                { "<leader>ff", "<cmd>Telescope find_files --hidden=true<cr>" },
-                { "<leader>fc", "<cmd>Telescope find_files --hidden=false<cr>" },
+                {
+                    "<leader>ff",
+                    function()
+                        require('telescope.builtin').find_files {
+                            hidden = false,
+                            follow = false,
+                        }
+                    end,
+                },
+                {
+                    "<leader>fF",
+                    function()
+                        require('telescope.builtin').find_files {
+                            hidden = true,
+                            follow = true,
+                        }
+                    end,
+                },
                 { "<leader>fb",
                     function(plugin)
                         require('telescope.builtin').buffers({ sort_lastused = true, ignore_current_buffer = true })
                     end,
                 },
                 { "<leader>fG", "<cmd>Telescope live_grep<cr>" },
-                { "<leader>fg", "<cmd>Telescope live_grep --type=cpp<cr>" },
-                { "<leader>fp", "<cmd>Telescope live_grep --type=py<cr>" },
+                {
+                    "<leader>fg", 
+                    function()
+                        require('telescope.builtin').live_grep {
+                            -- Here we pass FZF args
+                            additional_args = {"--hidden", "--glob", "!{**/.git/*, **/tags}"},
+                        }
+                    end,
+                },
+                {
+                    "<leader>fp",
+                    function()
+                        require('telescope.builtin').live_grep {
+                            additional_args = {"--hidden", "--glob", "!{**/.git/*, **/tags}", "--type", "python"},
+                        }
+                    end,
+                },
                 { "<leader>fs", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>" },
-            },
+	    },
             config = function()
                 local telescope = require("telescope")
                 local actions = require("telescope.actions")
@@ -158,15 +189,6 @@ function configure_pkg()
                     },
                 })
             end,
-        },
-        {
-            "NeogitOrg/neogit",
-            dependencies = {
-                "nvim-lua/plenary.nvim",
-                "nvim-telescope/telescope.nvim",
-                "sindrets/diffview.nvim",
-            },
-            config = true,
         },
         {
             "tpope/vim-fugitive",

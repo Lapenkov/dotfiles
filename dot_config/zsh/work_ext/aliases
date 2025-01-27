@@ -1,4 +1,6 @@
 #/* vim: set filetype=zsh : */
 
+alias bazel="bazelisk"
+
 # Copilot alias
 eval "$(github-copilot-cli alias -- "$0")"
