@@ -9,9 +9,9 @@ alias cz="chezmoi"
 
 alias b="bazelisk"
 
-alias zshconfig="v ${HOME}/.zshrc"
-alias vimconfig="v ${HOME}/.config/nvim/init.lua"
-alias tmuxconfig="v ${HOME}/.config/tmux/tmux.conf"
+alias zshconfig="cz edit --apply ${HOME}/.zshrc"
+alias vimconfig="cz edit --apply ${HOME}/.config/nvim/init.lua"
+alias tmuxconfig="cz edit --apply ${HOME}/.config/tmux/tmux.conf"
 
 alias zshreload="export PATH=\"/usr/bin:/bin:/usr/local/bin\" && source ${HOME}/.zshrc"
 
