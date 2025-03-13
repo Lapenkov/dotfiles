@@ -26,6 +26,8 @@ end
 function configure_search()
     vim.o.ignorecase = true
     vim.o.smartcase = true
+    vim.o.grepprg = "rg --vimgrep --no-heading --smart-case"
+    vim.o.grepformat = "%f:%l:%c:%m"
 end
 
 function configure_mouse()
@@ -113,7 +115,7 @@ function configure_pkg()
                 },
                 { "<leader>fb",
                     function(plugin)
-                        require('telescope.builtin').buffers({ sort_lastused = true, ignore_current_buffer = true })
+                        require('telescope.builtin').buffers({ sort_mru = true, ignore_current_buffer = true })
                     end,
                 },
                 { "<leader>fG", "<cmd>Telescope live_grep<cr>" },
@@ -213,9 +215,9 @@ function configure_pkg()
                 }
                 lspconfig.clangd.setup({
                     cmd = {
-                        "/home/lapenkoa/work/mdflow_core/external/llvm/bin/clangd",
+                        "/home/lapenkoa/work/nebula/external/llvm/bin/clangd",
                         "--background-index=false",
-                        "--header-insertion-decorators",
+                        "--header-insertion=never",
                         "--enable-config",
                         "--offset-encoding=utf-16",
                         "--malloc-trim",
