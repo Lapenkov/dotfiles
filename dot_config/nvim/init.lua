@@ -215,7 +215,7 @@ function configure_pkg()
                 }
                 lspconfig.clangd.setup({
                     cmd = {
-                        "/home/lapenkoa/work/nebula/external/llvm/bin/clangd",
+                        "clangd",
                         "--background-index=false",
                         "--header-insertion=never",
                         "--enable-config",
@@ -229,6 +229,11 @@ function configure_pkg()
                     group = vim.api.nvim_create_augroup("UserLspConfig", {}),
                     callback = function(ev)
                         local opts = { buffer = ev.buf }
+                        local buf_ft = vim.api.nvim_buf_get_option(ev.buf, "filetype")
+                        if buf_ft == "bzl" then
+                            -- For Bazel, we don't have an Lsp other than Copilot. Don't map.
+                            return
+                        end
                         vim.keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts)
                         vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, opts)
                         vim.keymap.set("n", "<leader>gt", vim.lsp.buf.type_definition, opts)
@@ -249,8 +254,43 @@ function configure_pkg()
         {
             "github/copilot.vim"
         },
+        {
+            "yarospace/lua-console.nvim",
+            keys = {
+                { "`", desc = "Lua-console - toggle" },
+                { "<leader>`", desc = "Lua-console - attach to buffer" },
+            },
+            opts = {},
+        },
+        {
+            "szw/vim-maximizer",
+            keys = {
+                { "<leader>sm", "<cmd>MaximizerToggle<cr>", desc = "Maximize/minimze split" },
+            }
+        },
     })
 end
+
+function configure_buildifier()
+    vim.api.nvim_create_autocmd("FileType", {
+        pattern = "bzl",
+        callback = function(event)
+            vim.keymap.set(
+                "n", "<leader>cc",
+                function()
+                    vim.cmd("silent !" .. vim.fn.expand("$HOME") .. "/go/bin/buildifier " .. vim.fn.expand("%:p"))
+                end,
+                { silent = true, buffer = event.buf }
+            )
+        end,
+    })
+end
+
+-- TODO:
+-- Lua formatting / linting
+-- Multi-file config
+-- Spell check?
+-- LLM integration?
 
 function configure()
     vim.o.number = true
@@ -265,6 +305,7 @@ function configure()
     configure_search()
     configure_mouse()
     configure_pkg()
+    configure_buildifier()
 end
 
 configure()

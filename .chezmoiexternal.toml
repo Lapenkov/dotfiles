@@ -17,3 +17,7 @@
     url = "https://github.com/agkozak/agkozak-zsh-prompt/archive/refs/tags/v{{ $agkozakVersion }}.tar.gz"
     path = "agkozak-zsh-prompt.plugin.zsh"
     stripComponents = 1
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm"
+    refreshPeriod = "168h"
