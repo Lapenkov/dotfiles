@@ -1,13 +1,29 @@
 function configure_commands()
     -- Custom commands start with L (short for lapenkoa)
 
-    vim.api.nvim_create_user_command("LOpenPwd",
-        function(opts)
-            vim.cmd.Neotree()
-            vim.cmd.wincmd("l")
-            require("telescope.builtin").find_files()
-        end,
-        {})
+    vim.api.nvim_create_user_command("LOpenPwd", function(opts)
+        -- Schedule to execute in the main loop; after Telescope initializes
+        vim.schedule(function(opts)
+            local action = require("telescope.actions")
+            local action_state = require("telescope.actions.state")
+
+            require("telescope.builtin").find_files({
+                attach_mappings = function(prompt_bufnr, map)
+                    map("i", "<CR>", function()
+                        local selection = action_state.get_selected_entry()
+
+                        action.select_default(prompt_bufnr)
+                        require("neo-tree.command").execute({
+                            action = "show",
+                            reveal_file = selection.path,
+                            reveal_force_cwd = true,
+                        })
+                    end)
+                    return true
+                end
+            })
+        end)
+    end, {})
 end
 
 function configure_nonpkg_mappings()
@@ -60,7 +76,7 @@ function configure_pkg()
             },
             keys = {
                 { "<leader>tt", "<cmd>Neotree focus<cr>" },
-                { "<leader>tf", "<cmd>Neotree reveal reveal_force_cwd<cr>" },
+                { "<leader>tf", "<cmd>Neotree position=left reveal=true reveal_force_cwd<cr>" },
                 { "<leader>tc", "<cmd>Neotree close<cr>" },
             },
             config = function()
@@ -69,6 +85,10 @@ function configure_pkg()
                         window = {
                             mappings = {
                                 ["u"] = "navigate_up",
+                                ["p"] = function(state)
+                                    local node = state.tree:get_node()
+                                    require("neo-tree.ui.renderer").focus_node(state, node:get_parent_id())
+                                end,
                             },
                         },
                     },
@@ -103,6 +123,7 @@ function configure_pkg()
                             follow = false,
                         }
                     end,
+                    desc = "Find fildes (only non-hidden ones)",
                 },
                 {
                     "<leader>fF",
@@ -112,13 +133,23 @@ function configure_pkg()
                             follow = true,
                         }
                     end,
+                    desc = "Find fildes (including hidden ones)",
                 },
-                { "<leader>fb",
+                {
+                    "<leader>fh",
+                    function()
+                        require('telescope.builtin').help_tags()
+                    end,
+                    desc = "Search help tags",
+                },
+                {
+                    "<leader>fb",
                     function(plugin)
                         require('telescope.builtin').buffers({ sort_mru = true, ignore_current_buffer = true })
                     end,
+                    desc = "Search buffers",
                 },
-                { "<leader>fG", "<cmd>Telescope live_grep<cr>" },
+                { "<leader>fG", "<cmd>Telescope live_grep<cr>", desc = "Live grep" },
                 {
                     "<leader>fg", 
                     function()
@@ -127,6 +158,7 @@ function configure_pkg()
                             additional_args = {"--hidden", "--glob", "!{**/.git/*, **/tags}"},
                         }
                     end,
+                    desc = "Live grep with hidden files",
                 },
                 {
                     "<leader>fp",
@@ -135,8 +167,9 @@ function configure_pkg()
                             additional_args = {"--hidden", "--glob", "!{**/.git/*, **/tags}", "--type", "python"},
                         }
                     end,
+                    desc = "Live grep Python files",
                 },
-                { "<leader>fs", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>" },
+                { "<leader>fs", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", "Search symbols" },
 	    },
             config = function()
                 local telescope = require("telescope")
@@ -196,7 +229,7 @@ function configure_pkg()
             "tpope/vim-fugitive",
             lazy = false,
             keys = {
-                { "<leader>tb", "<cmd>Git blame<cr>" },
+                { "<leader>tb", "<cmd>Git blame<cr>", desc = "Toggle blame" },
             },
         },
         {
@@ -224,6 +257,7 @@ function configure_pkg()
                         "--pch-storage=disk"
                     },
                 })
+                lspconfig.lua_ls.setup {}
 
                 vim.api.nvim_create_autocmd("LspAttach", {
                     group = vim.api.nvim_create_augroup("UserLspConfig", {}),
@@ -280,17 +314,22 @@ function configure_buildifier()
                 function()
                     vim.cmd("silent !" .. vim.fn.expand("$HOME") .. "/go/bin/buildifier " .. vim.fn.expand("%:p"))
                 end,
-                { silent = true, buffer = event.buf }
+                { silent = true, buffer = event.buf, desc = "Apply buildifier to the current buffer" }
             )
         end,
+    })
+end
+
+function configure_spellcheck()
+    vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "markdown", "text", "gitcommit" },
+        command = "setlocal spell",
     })
 end
 
 -- TODO:
 -- Lua formatting / linting
 -- Multi-file config
--- Spell check?
--- LLM integration?
 
 function configure()
     vim.o.number = true
@@ -306,6 +345,7 @@ function configure()
     configure_mouse()
     configure_pkg()
     configure_buildifier()
+    configure_spellcheck()
 end
 
 configure()
