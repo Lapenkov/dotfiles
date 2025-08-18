@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+if [ -x "{{ .chezmoi.homeDir }}/.fzf/install" ]; then
+  echo "Running fzf install script..."
+  "{{ .chezmoi.homeDir }}/.fzf/install" --all --no-bash --no-fish
+fi
