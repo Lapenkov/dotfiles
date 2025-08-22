@@ -37,6 +37,11 @@ function configure_indent()
     vim.o.expandtab = true
     vim.o.tabstop = 4
     vim.o.shiftwidth = 4
+    vim.o.cindent = true
+    -- Don't indent inside namespaces
+    vim.opt.cinoptions:append("N-s")
+    -- Half-indent scope modifiers (i.e. private, public, protected)
+    vim.opt.cinoptions:append("g-0.5s")
 end
 
 function configure_search()
@@ -274,6 +279,7 @@ function configure_pkg()
                         vim.keymap.set("n", "<leader>gr", require('telescope.builtin').lsp_references, opts)
                         vim.keymap.set("n", "<leader>gc", require('telescope.builtin').lsp_incoming_calls, opts)
                         vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, opts)
+                        vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
                         vim.keymap.set("n", "<leader>cf", function() vim.lsp.buf.code_action { apply = true } end, opts)
                         vim.keymap.set("n", "<leader>ee", vim.diagnostic.open_float, opts)
                         vim.keymap.set({ "n", "v" }, "<leader>cc", vim.lsp.buf.format, opts)
@@ -312,7 +318,20 @@ function configure_buildifier()
             vim.keymap.set(
                 "n", "<leader>cc",
                 function()
-                    vim.cmd("silent !" .. vim.fn.expand("$HOME") .. "/go/bin/buildifier " .. vim.fn.expand("%:p"))
+                    vim.cmd(':w')
+                    local buildifier_cmd = vim.fn.expand("$HOME") .. "/go/bin/buildifier"
+                    local current_buffer_path = vim.api.nvim_buf_get_name(0)
+                    local res = vim.system({ buildifier_cmd, current_buffer_path }, { text = true }):wait()
+                    if res.code ~= 0 then
+                        local stderr_out = res.stderr or ""
+                        vim.api.nvim_echo({
+                            { "Buildifier failed with error code " .. res.code .. ".", "ErrorMsg" },
+                            { "\nStderr: " .. stderr_out, "ErrorMsg" }
+                        }, true, {})
+                    else
+                        vim.api.nvim_echo({{ "Successfully applied buildifier", "Normal" }}, false, {})
+                        vim.cmd("checktime") -- Reload the buffer, since its timestamp has changed
+                    end
                 end,
                 { silent = true, buffer = event.buf, desc = "Apply buildifier to the current buffer" }
             )
