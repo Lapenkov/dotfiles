@@ -4,24 +4,7 @@ function configure_commands()
     vim.api.nvim_create_user_command("LOpenPwd", function(opts)
         -- Schedule to execute in the main loop; after Telescope initializes
         vim.schedule(function(opts)
-            local action = require("telescope.actions")
-            local action_state = require("telescope.actions.state")
-
-            require("telescope.builtin").find_files({
-                attach_mappings = function(prompt_bufnr, map)
-                    map("i", "<CR>", function()
-                        local selection = action_state.get_selected_entry()
-
-                        action.select_default(prompt_bufnr)
-                        require("neo-tree.command").execute({
-                            action = "show",
-                            reveal_file = selection.path,
-                            reveal_force_cwd = true,
-                        })
-                    end)
-                    return true
-                end
-            })
+            require("telescope.builtin").find_files({})
         end)
     end, {})
 end
@@ -71,34 +54,16 @@ function configure_pkg()
 
     require("lazy").setup({
         {
-            "nvim-neo-tree/neo-tree.nvim",
+            "stevearc/oil.nvim",
+            opts = {
+                skip_confirm_for_simple_edits = false,
+                watch_for_changes = true,
+            },
+            dependencies = { { "nvim-web-devicons", opts = {} } },
             lazy = false,
-            branch = "v3.x",
-            dependencies = {
-                "nvim-lua/plenary.nvim",
-                "nvim-tree/nvim-web-devicons",
-                "MunifTanjim/nui.nvim",
-            },
             keys = {
-                { "<leader>tt", "<cmd>Neotree focus<cr>" },
-                { "<leader>tf", "<cmd>Neotree position=left reveal=true reveal_force_cwd<cr>" },
-                { "<leader>tc", "<cmd>Neotree close<cr>" },
+                { "-", "<cmd>Oil --float<cr>" },
             },
-            config = function()
-                require("neo-tree").setup({
-                    filesystem = {
-                        window = {
-                            mappings = {
-                                ["u"] = "navigate_up",
-                                ["p"] = function(state)
-                                    local node = state.tree:get_node()
-                                    require("neo-tree.ui.renderer").focus_node(state, node:get_parent_id())
-                                end,
-                            },
-                        },
-                    },
-                })
-            end
         },
         {
             -- Theme; colorscheme
