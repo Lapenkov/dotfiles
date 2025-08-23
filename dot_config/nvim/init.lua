@@ -1,43 +1,3 @@
-function configure_commands()
-    -- Custom commands start with L (short for lapenkoa)
-
-    vim.api.nvim_create_user_command("LOpenPwd", function(opts)
-        -- Schedule to execute in the main loop; after Telescope initializes
-        vim.schedule(function(opts)
-            require("telescope.builtin").find_files({})
-        end)
-    end, {})
-end
-
-function configure_nonpkg_mappings()
-    vim.g.mapleader = " "
-    vim.keymap.set("n", "<leader>n", "<cmd>nohlsearch<cr>")
-    vim.keymap.set("n", "]c", "<cmd>cnext<cr>")
-    vim.keymap.set("n", "]C", "<cmd>cprev<cr>")
-end
-
-function configure_indent()
-    vim.o.expandtab = true
-    vim.o.tabstop = 4
-    vim.o.shiftwidth = 4
-    vim.o.cindent = true
-    -- Don't indent inside namespaces
-    vim.opt.cinoptions:append("N-s")
-    -- Half-indent scope modifiers (i.e. private, public, protected)
-    vim.opt.cinoptions:append("g-0.5s")
-end
-
-function configure_search()
-    vim.o.ignorecase = true
-    vim.o.smartcase = true
-    vim.o.grepprg = "rg --vimgrep --no-heading --smart-case"
-    vim.o.grepformat = "%f:%l:%c:%m"
-end
-
-function configure_mouse()
-    vim.o.mouse = ""
-end
-
 function configure_pkg()
     local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
     if not vim.loop.fs_stat(lazypath) then
@@ -276,44 +236,8 @@ function configure_pkg()
     })
 end
 
-function configure_buildifier()
-    vim.api.nvim_create_autocmd("FileType", {
-        pattern = "bzl",
-        callback = function(event)
-            vim.keymap.set(
-                "n", "<leader>cc",
-                function()
-                    vim.cmd(':w')
-                    local buildifier_cmd = vim.fn.expand("$HOME") .. "/go/bin/buildifier"
-                    local current_buffer_path = vim.api.nvim_buf_get_name(0)
-                    local res = vim.system({ buildifier_cmd, current_buffer_path }, { text = true }):wait()
-                    if res.code ~= 0 then
-                        local stderr_out = res.stderr or ""
-                        vim.api.nvim_echo({
-                            { "Buildifier failed with error code " .. res.code .. ".", "ErrorMsg" },
-                            { "\nStderr: " .. stderr_out, "ErrorMsg" }
-                        }, true, {})
-                    else
-                        vim.api.nvim_echo({{ "Successfully applied buildifier", "Normal" }}, false, {})
-                        vim.cmd("checktime") -- Reload the buffer, since its timestamp has changed
-                    end
-                end,
-                { silent = true, buffer = event.buf, desc = "Apply buildifier to the current buffer" }
-            )
-        end,
-    })
-end
-
-function configure_spellcheck()
-    vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "markdown", "text", "gitcommit" },
-        command = "setlocal spell",
-    })
-end
-
 -- TODO:
 -- Lua formatting / linting
--- Multi-file config
 
 function configure()
     vim.o.number = true
@@ -322,14 +246,15 @@ function configure()
     vim.o.wildmode = "full"
     vim.o.matchpairs =  vim.o.matchpairs .. ",<:>"
 
-    configure_commands()
-    configure_nonpkg_mappings()
-    configure_indent()
-    configure_search()
-    configure_mouse()
+    require("commands").configure()
+    require("nonpkg_mappings").configure()
+    require("indent").configure()
+    require("search").configure()
+    require("mouse").configure()
+    require("buildifier").configure()
+    require("spellcheck").configure()
+
     configure_pkg()
-    configure_buildifier()
-    configure_spellcheck()
 end
 
 configure()
