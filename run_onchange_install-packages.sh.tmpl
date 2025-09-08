@@ -1,4 +1,6 @@
 #!/bin/sh
+# vim: set filetype=bash :
+
 echo "Installing OS-specific packages"
 
 {{ if eq .chezmoi.osRelease.id "ubuntu" -}}
@@ -10,8 +12,14 @@ echo "Installing Go"
 GO_VERSION="1.25.1"
 sudo rm -rf /usr/local/go && wget https://go.dev/dl/go${GO_VERSION}.linux-386.tar.gz -O go.tar.gz && sudo tar -C /usr/local -xzf go.tar.gz
 rm -f go.tar.gz
-
 export PATH=$PATH:/usr/local/go/bin
 
 echo "Installing buildifier"
 go install github.com/bazelbuild/buildtools/buildifier@latest
+
+echo "Installing bazelisk"
+BAZELISK_VERSION="1.27.0"
+BAZELISK_DIR="$HOME/bin"
+mkdir -p $BAZELISK_DIR
+wget https://github.com/bazelbuild/bazelisk/releases/download/v${BAZELISK_VERSION}/bazelisk-linux-amd64 -O "${BAZELISK_DIR}/bazelisk" && \
+         chmod +x "${BAZELISK_DIR}/bazelisk"
