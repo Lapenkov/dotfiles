@@ -152,6 +152,10 @@ function configure_pkg()
                             node_decremental = '<S-TAB>',
                         },
                     },
+                    indent = {
+                        enable = true,
+                        disable = { "c", "cpp" },
+                    },
                 })
             end,
         },
@@ -176,6 +180,8 @@ function configure_pkg()
                             plugins = {
                                 black = { enabled = true },
                                 yapf = { enabled = false },
+                                pylint = { enabled = true, executable = "pylint" },
+                                jedi_completion = { fuzzy = true },
                             },
                         },
                     },
@@ -326,7 +332,7 @@ function configure_pkg()
                             local menu_icon = {
                                 nvim_lsp = 'λ',
                                 luasnip = '⋗',
-                                buffer = 'Ω',
+                                buffer = '𝚻',
                                 path = '🖫',
                             }
 
