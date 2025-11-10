@@ -170,13 +170,12 @@ function configure_pkg()
             "neovim/nvim-lspconfig",
             dependencies = { "hrsh7th/cmp-nvim-lsp" },
             config = function()
-                local lspconfig = require("lspconfig")
                 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-                lspconfig.pylsp.setup({
+                vim.lsp.config("pylsp", {
                     capabilities = capabilities,
                     settings = {
-                        pylsp = {
+                        ["pylsp"] = {
                             plugins = {
                                 black = { enabled = true },
                                 yapf = { enabled = false },
@@ -186,7 +185,9 @@ function configure_pkg()
                         },
                     },
                 })
-                lspconfig.clangd.setup({
+                vim.lsp.enable("pylsp")
+
+                vim.lsp.config("clangd", {
                     capabilities = capabilities,
                     cmd = {
                         "clangd",
@@ -201,9 +202,12 @@ function configure_pkg()
                         "--pch-storage=disk"
                     },
                 })
-                lspconfig.lua_ls.setup({
+                vim.lsp.enable("clangd")
+
+                vim.lsp.config("lua_lsp", {
                     capabilities = capabilities,
                 })
+                vim.lsp.enable("lua_lsp")
 
                 vim.api.nvim_create_autocmd("LspAttach", {
                     group = vim.api.nvim_create_augroup("UserLspConfig", {}),
@@ -224,7 +228,7 @@ function configure_pkg()
                         vim.keymap.set("n", "<leader>cf", function() vim.lsp.buf.code_action { apply = true } end, opts)
                         vim.keymap.set("n", "<leader>ee", vim.diagnostic.open_float, opts)
                         vim.keymap.set({ "n", "v" }, "<leader>cc", vim.lsp.buf.format, opts)
-                        vim.keymap.set("n", "<leader>gh", "<cmd>ClangdSwitchSourceHeader<cr>")
+                        vim.keymap.set("n", "<leader>gh", "<cmd>LspClangdSwitchSourceHeader<cr>")
                         vim.keymap.set("n", "<leader>ci", vim.lsp.buf.hover, opts)
                         vim.keymap.set("n", "]e", vim.diagnostic.goto_next, opts)
                         vim.keymap.set("n", "]E", vim.diagnostic.goto_prev, opts)
@@ -337,6 +341,13 @@ function configure_pkg()
                             }
 
                             item.menu = menu_icon[entry.source.name]
+                            local compl_item = entry:get_completion_item()
+                            if compl_item.detail then
+                                if item.kind == 'Method' then
+                                    item.kind = item.kind .. ' ->'
+                                end
+                                item.kind = item.kind .. ' [' .. (compl_item.detail) .. ']'
+                            end
                             return item
                         end,
                     },
