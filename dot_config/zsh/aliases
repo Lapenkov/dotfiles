@@ -1,6 +1,7 @@
 #/* vim: set filetype=zsh : */
 
-alias ll="ls -lh --group-directories-first"
+alias l="eza -la --group-directories-first"
+alias ll="eza -l --group-directories-first"
 
 alias v="nvim"
 alias vv="nvim +LOpenPwd"
@@ -21,3 +22,5 @@ alias glg="git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d
 alias glg2="log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
 alias gcnv="git commit --no-verify"
 alias ggpf='git push origin $(git_current_branch) --force'
+
+alias pschain="pstree -ps"
