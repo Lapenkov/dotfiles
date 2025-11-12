@@ -228,7 +228,16 @@ function configure_pkg()
                         vim.keymap.set("n", "<leader>cf", function() vim.lsp.buf.code_action { apply = true } end, opts)
                         vim.keymap.set("n", "<leader>ee", vim.diagnostic.open_float, opts)
                         vim.keymap.set({ "n", "v" }, "<leader>cc", vim.lsp.buf.format, opts)
-                        vim.keymap.set("n", "<leader>gh", "<cmd>LspClangdSwitchSourceHeader<cr>")
+                        vim.keymap.set("n", "<leader>gh", function()
+                                for _, win in pairs(vim.api.nvim_list_wins()) do
+                                    local config = vim.api.nvim_win_get_config(win)
+                                    if config.relative ~= '' then
+                                        vim.api.nvim_win_close(win, true)
+                                    end
+                                end
+                                vim.cmd("LspClangdSwitchSourceHeader")
+                            end,
+                            opts)
                         vim.keymap.set("n", "<leader>ci", vim.lsp.buf.hover, opts)
                         vim.keymap.set("n", "]e", vim.diagnostic.goto_next, opts)
                         vim.keymap.set("n", "]E", vim.diagnostic.goto_prev, opts)
