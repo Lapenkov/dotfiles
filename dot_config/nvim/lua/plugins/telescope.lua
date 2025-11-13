@@ -3,6 +3,7 @@ return {
   branch = "0.1.x",
   dependencies = {
     "nvim-lua/plenary.nvim",
+    "nvim-telescope/telescope-ui-select.nvim",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   },
   keys = {
@@ -85,7 +86,12 @@ return {
           override_file_sorter = true,
           case_mode = "smart_case",
         },
+        ["ui-select"] = {
+          require("telescope.themes").get_dropdown {}
+        },
       },
     })
+
+    telescope.load_extension("ui-select")
   end,
 }
