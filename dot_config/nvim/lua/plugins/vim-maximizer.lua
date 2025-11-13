@@ -1,6 +1,6 @@
 return {
-    "szw/vim-maximizer",
-    keys = {
-        { "<leader>sm", "<cmd>MaximizerToggle<cr>", desc = "Maximize/minimze split" },
-    }
+  "szw/vim-maximizer",
+  keys = {
+    { "<leader>sm", "<cmd>MaximizerToggle<cr>", desc = "Maximize/minimze split" },
+  },
 }
