@@ -1,10 +1,10 @@
 local M = {}
 
 function M.configure()
-  vim.o.expandtab = true
-  vim.o.tabstop = 4
-  vim.o.shiftwidth = 4
-  vim.o.cindent = true
+  vim.opt.expandtab = true
+  vim.opt.tabstop = 4
+  vim.opt.shiftwidth = 4
+  vim.opt.cindent = true
   -- Don't indent inside namespaces
   vim.opt.cinoptions:append("N-s")
   -- Half-indent scope modifiers (i.e. private, public, protected)
