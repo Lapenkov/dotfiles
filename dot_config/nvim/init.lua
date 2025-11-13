@@ -12,11 +12,16 @@ function configure_pkg()
   end
   vim.opt.rtp:prepend(lazypath)
 
-  require("lazy").setup("plugins")
+  require("lazy").setup({
+    spec = {
+      { import = "plugins" },
+    },
+    change_detection = {
+      enabled = false,
+      notify = false,
+    },
+  })
 end
-
--- TODO:
--- Lua formatting / linting
 
 function configure()
   vim.o.number = true

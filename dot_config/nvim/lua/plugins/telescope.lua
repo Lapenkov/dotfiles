@@ -24,7 +24,7 @@ return {
           follow = true,
         })
       end,
-      desc = "Find fildes (including hidden ones)",
+      desc = "Find files (including hidden ones)",
     },
     {
       "<leader>fh",
